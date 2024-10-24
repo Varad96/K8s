@@ -1,0 +1,41 @@
+# K8s Architecture
+Components of K8s Architecture:
+    Control Plane/ Master Node.
+    Worker Node (can be multiple).
+
+Control Plane/ Master Node:
+    API-Server:
+        Kubernetes Api server kade vicharayla sagle yetat (Big boss of the house).
+        Main component of K8s architecture.
+        Listens to all requests.
+    
+    Control Manager:
+        It is responsible to maintain the state of resource.
+        Actual State = Desired State.
+        It also manages the PODs.
+    
+    etdc Cluster:
+        It is a storage of K8s.
+        It stores the information of all PODs.
+        It is not an entity of K8s, it is only accessible by k8s-api-server.
+        
+    Kube Schedular:
+        It is responsible for doing the actual work.
+
+Worker Node:       
+    POD:
+        It is an atomic unit(smallest unit) of K8s.
+        Containers are created inside of POD.
+        Containers are tightly coupled inside POD.
+        POD is controlled by kubelet.
+        No POD can communicate with each other.
+        
+    Kubelet:
+        Kubelet is responsible for controlling POD.
+        Kublet will send request to api-server for creating POD.
+        
+    Kubr Proxy:
+        IP assigning is done by Kube Proxy.
+        Networking ka kam is done by Kube Proxy.
+        Container dosen't have IP address in K8s.
+        Ip address is given to POD.
