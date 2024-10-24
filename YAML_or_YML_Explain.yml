@@ -1,0 +1,28 @@
+# .yaml or .yml in K8s Explaination
+
+Fulform: YAMAL ain't markup language.
+         YAMAL is superset of JASON.
+         We use yaml file as it is easier to read.
+        
+
+# Example of .yml file
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: container1
+      image: nginx
+    - name : container2
+      image: ubuntu
+
+# How to read above .yml file
+YAMAL uses key-value pair to represent data.
+Each key is followed by (:) colon and then there is value.
+
+apiVersion: it defines the version of the which is compatible for the kind.
+kind: it is to identify the type of K8s resource.
+metadata: it contains the information of resource like name, label.
+spec: it contains the specifications of the resource.
+containers: It contains the image-name and docker image which you want in container.
