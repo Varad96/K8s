@@ -39,3 +39,5 @@ Worker Node:
         Networking ka kam is done by Kube Proxy.
         Container dosen't have IP address in K8s.
         Ip address is given to POD.
+
+ # K8s Architecture flow.       
