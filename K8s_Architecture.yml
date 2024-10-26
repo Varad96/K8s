@@ -13,6 +13,11 @@ Control Plane/ Master Node:
         It is responsible to maintain the state of resource.
         Actual State = Desired State.
         It also manages the PODs.
+           Components:
+                Node-controller
+                Route-controller
+                Service-controller
+                Volume-controller
     
     etdc Cluster:
         It is a storage of K8s.
@@ -40,4 +45,4 @@ Worker Node:
         Container dosen't have IP address in K8s.
         Ip address is given to POD.
 
- # K8s Architecture flow.       
+ # K8s Architecture flow.
