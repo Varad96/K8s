@@ -1,0 +1,105 @@
+K8S installation
+
+###eksctl configuration setup ####
+
+create ec2-ubuntu
+
+
+give iam role
+
+install awscli =curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                    unzip awscliv2.zip
+                    sudo ./aws/install
+
+
+
+install kubectl 
+kubectl binary = curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.31.0/2024-09-12/bin/linux/amd64/kubectl
+
+Verify the downloaded binary with the SHA-256 checksum for your binary.
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.31.0/2024-09-12/bin/linux/amd64/kubectl.sha256
+
+Check the SHA-256 checksum for your downloaded binary
+sha256sum -c kubectl.sha256
+
+
+Apply execute permissions to the binary.
+chmod +x ./kubectl
+
+Copy the binary to a folder in your PATH
+mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
+
+#####install eksctl
+
+# for ARM systems, set ARCH to: `arm64`, `armv6` or `armv7`
+ARCH=amd64
+PLATFORM=$(uname -s)_$ARCH
+
+curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+
+# (Optional) Verify checksum
+curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
+
+tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+
+sudo mv /tmp/eksctl /usr/local/bin
+
+create cluster
+eksctl create cluster -n "eks" -r us-east-1 -t t2.micro -N 2
+
+create pods
+vim pod.yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myfirstpod
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+
+deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-first-deployment
+  labels:
+    app: prajvalstore
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: prajvalstore
+  template:
+    metadata:
+      labels:
+        app: prajvalstore
+    spec:
+      containers:
+      - name: onlinebookestore
+        image: prajval28/b8-registry:v1
+        ports:
+        - containerPort: 8080
+ kubectl apply -f deployment.yml
+service
+---		
+		
+apiVersion: v1
+kind: Service
+metadata:
+  name: prajvalstore
+spec:
+  type: LoadBalancer
+  selector:
+    app: prajvalstore
+  ports:
+    - protocol: TCP
+      port: 8080
+	  targetPort: 8080
+
+kubectl apply -f service.yml
+
+eksctl delete cluster -n cluster -r region
