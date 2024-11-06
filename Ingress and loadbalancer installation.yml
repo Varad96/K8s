@@ -1,0 +1,115 @@
+Ingress and Loadbalancer Controller Installation.
+
+Create a namespace
+check below yaml
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+
+
+Create deployment for nginx and httpd
+use below yaml file
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dev
+  name: nginx-deployment
+  labels:
+    app: nginx1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx1
+  template:
+    metadata:
+      labels:
+        app: nginx1
+    spec:
+      containers:
+      - name: nginx1
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dev
+  name: httpd-deployment
+  labels:
+    app: httpd1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: httpd1
+  template:
+    metadata:
+      labels:
+        app: httpd1
+    spec:
+      containers:
+      - name: httpd
+        image: httpd:latest
+        ports:
+        - containerPort: 80
+
+
+Use below documentation:
+https://docs.aws.amazon.com/eks/latest/userguide/lbc-manifest.html
+
+ANPAXWMA6KSNTN4INZZJ6
+
+root@ip-172-31-89-220:~# aws iam create-policy \
+    --policy-name AWSLoadBalancerControllerIAMPolicy \
+    --policy-document file://iam_policy.json
+{
+    "Policy": {
+        "PolicyName": "AWSLoadBalancerControllerIAMPolicy",
+        "PolicyId": "ANPAXWMA6KSNTN4INZZJ6",
+        "Arn": "arn:aws:iam::529088271515:policy/AWSLoadBalancerControllerIAMPolicy",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2024-11-06T07:25:08+00:00",
+        "UpdateDate": "2024-11-06T07:25:08+00:00"
+    }
+}
+
+eksctl create iamserviceaccount \
+  --cluster=varadeks \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller \
+  --role-name AmazonEKSLoadBalancerControllerRole \
+  --attach-policy-arn=arn:aws:iam::529088271515:policy/AWSLoadBalancerControllerIAMPolicy \
+  --approve
+  
+you will get below error:
+Error: could not create cluster provider from options: 
+AWS Region must be set, please set the AWS Region in AWS config file or as environment variable
+
+Then run below command: 
+aws configure 
+and pass the Region
+
+then run "iamserviceaccount" command
+
+Then again you will get "oidc" error.
+Run below command:
+oidc_id=$(aws eks describe-cluster --name varadeks --query "cluster.identity.oidc.issuer" --output text | cut -d '/' -f 5)
+
+Create OIDC provider:
+cluster_name=varadeks
+oidc_id=$(aws eks describe-cluster --name varadeks --query "cluster.identity.oidc.issuer" --output text | cut -d '/' -f 5)
+echo $oidc_id 
+(copy the numberfrom above command output)
+eksctl utils associate-iam-oidc-provider --cluster varadeks --approve
+
+
+ED148D45188BCA361EAB1B1224BEAB46
